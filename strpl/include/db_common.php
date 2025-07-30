@@ -694,55 +694,62 @@ class ArrayQueryWrapper{
 }
 
 class MySQLDBDataWrapper extends DBDataWrapper{
-	protected $last_result;
-	public function query($sql){
-		LogMaster::log($sql);
-		$res=mysql_query($sql,$this->connection);
-		if ($res===false) throw new Exception("MySQL operation failed\n".mysql_error($this->connection));
-		$this->last_result = $res;
-		return $res;
-	}
-	
-	public function get_next($res){
-		if (!$res)
-			$res = $this->last_result;
-			
-		return mysql_fetch_assoc($res);
-	}
-	
-	public function get_new_id(){
-		return mysql_insert_id($this->connection);
-	}
-	
-	public function escape($data){
-		return mysql_real_escape_string($data, $this->connection);
-	}
+        protected $last_result;
 
-	public function tables_list() {
-		$result = mysql_query("SHOW TABLES");
-		if ($result===false) throw new Exception("MySQL operation failed\n".mysql_error($this->connection));
+        public function query($sql){
+                LogMaster::log($sql);
+                $res = $this->connection->query($sql);
+                if ($res === false) {
+                        throw new Exception("MySQL operation failed\n".$this->connection->error);
+                }
+                $this->last_result = $res;
+                return $res;
+        }
 
-		$tables = array();
-		while ($table = mysql_fetch_array($result)) {
-			$tables[] = $table[0];
-		}
-		return $tables;
-	}
+        public function get_next($res){
+                if (!$res)
+                        $res = $this->last_result;
 
-	public function fields_list($table) {
-		$result = mysql_query("SHOW COLUMNS FROM `".$table."`");
-		if ($result===false) throw new Exception("MySQL operation failed\n".mysql_error($this->connection));
+                return $res->fetch_assoc();
+        }
 
-		$fields = array();
-        $id = "";
-		while ($field = mysql_fetch_assoc($result)) {
-			if ($field['Key'] == "PRI")
-				$id = $field["Field"];
-            else
-			    $fields[] = $field["Field"];
-		}
-		return array("fields" => $fields, "key" => $id );
-	}
+        public function get_new_id(){
+                return $this->connection->insert_id;
+        }
+
+        public function escape($data){
+                return $this->connection->real_escape_string($data);
+        }
+
+        public function tables_list() {
+                $result = $this->connection->query("SHOW TABLES");
+                if ($result===false) {
+                        throw new Exception("MySQL operation failed\n".$this->connection->error);
+                }
+
+                $tables = array();
+                while ($table = $result->fetch_array(MYSQLI_NUM)) {
+                        $tables[] = $table[0];
+                }
+                return $tables;
+        }
+
+        public function fields_list($table) {
+                $result = $this->connection->query("SHOW COLUMNS FROM `".$table."`");
+                if ($result===false) {
+                        throw new Exception("MySQL operation failed\n".$this->connection->error);
+                }
+
+                $fields = array();
+                $id = "";
+                while ($field = $result->fetch_assoc()) {
+                        if ($field['Key'] == "PRI")
+                                $id = $field["Field"];
+                        else
+                                $fields[] = $field["Field"];
+                }
+                return array("fields" => $fields, "key" => $id );
+        }
 	
 
 	public function escape_name($data){

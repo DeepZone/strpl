@@ -1,16 +1,15 @@
-<?
-include "../includes/db.read.inc.php";
+<?php
+require __DIR__ . "/include/config.php";
 
-$conID = mysql_connect( $host, $user, $pass ) or die( "Die Datenbank konnte nicht erreicht werden!" );
-if ($conID)
-   {
-	   mysql_select_db( $db, $conID );
-      }
+$mysqli = new mysqli($mysql_server, $mysql_user, $mysql_pass, $mysql_db);
+if ($mysqli->connect_errno) {
+    die('Die Datenbank konnte nicht erreicht werden!');
+}
 
 
 $sql = "SELECT * FROM `events` WHERE start_date >= NOW()";
-$abfrageergebnis = mysql_query( $sql, $conID );
-$anzahl = mysql_num_rows( $abfrageergebnis );
+$abfrageergebnis = $mysqli->query($sql);
+$anzahl = $abfrageergebnis ? $abfrageergebnis->num_rows : 0;
 
 
 
@@ -33,7 +32,7 @@ echo "<p>Es sind <strong>" .$anzahl. "</strong> Sendungen im Plan! ";
     				
 				</tr> 
 			</thead> 
-<?php while ($datensatz = mysql_fetch_array( $abfrageergebnis )) { 
+<?php while ($datensatz = $abfrageergebnis && ($datensatz = $abfrageergebnis->fetch_assoc())) {
 
 
 $start = $datensatz['start_date'];
@@ -49,13 +48,13 @@ $datum = date("d.m.Y",strtotime($start));
 ?>
   			<tbody> 
 				<tr> 
-                    <td><? echo "$datum"; ?></td>
-   		 <?php echo "<td>" .$datensatz['event_name']. "</td>"; ?>	
-    	    		<td><? echo "$zeitvon"; ?></td> 
-    				<td><? echo "$zeitbis"; ?></td> 
-          <?php // echo "<td>" .$datensatz['details']. "</td>"; ?> 
-   
+                    <td><?php echo $datum; ?></td>
+                 <td><?php echo htmlspecialchars($datensatz['event_name']); ?></td>
+                        <td><?php echo $zeitvon; ?></td>
+                                <td><?php echo $zeitbis; ?></td>
+          <?php // echo "<td>" .$datensatz['details']. "</td>"; ?>
 
-                </tr> <?php  mysql_close($conID); } ?>
+
+                </tr> <?php } $mysqli->close(); ?>
 </tbody> 
 </table>

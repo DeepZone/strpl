@@ -1,4 +1,4 @@
-<?
+<?php
 /****************************************************************************** 
 * Streamplaner v 1.0                                                          *
 * (c) 2014 by NoiSens Media - www.noisens.de                                  *
@@ -11,17 +11,16 @@
 //**************************
 
 
-include "strpl/includes/config.php";
+require __DIR__ . '/strpl/include/config.php';
 
-$conID = mysql_connect( $host, $user, $pass ) or die( "Die Datenbank konnte nicht erreicht werden!" );
-if ($conID)
-   {
-	   mysql_select_db( $db, $conID );
-      }
+$mysqli = new mysqli($mysql_server, $mysql_user, $mysql_pass, $mysql_db);
+if ($mysqli->connect_errno) {
+    die('Die Datenbank konnte nicht erreicht werden!');
+}
 
 $sql = "SELECT * FROM `events` WHERE start_date >= NOW()";
-$abfrageergebnis = mysql_query( $sql, $conID );
-$anzahl = mysql_num_rows( $abfrageergebnis );
+$abfrageergebnis = $mysqli->query($sql);
+$anzahl = $abfrageergebnis ? $abfrageergebnis->num_rows : 0;
 
 ?>
 
@@ -37,7 +36,7 @@ $anzahl = mysql_num_rows( $abfrageergebnis );
 				</tr> 
 			</thead> 
 
-<?php while ($datensatz = mysql_fetch_array( $abfrageergebnis )) { 
+<?php while ($datensatz = $abfrageergebnis && ($datensatz = $abfrageergebnis->fetch_assoc())) {
 
 $start = $datensatz['start_date'];
 $end = $datensatz['end_date'];
@@ -49,11 +48,11 @@ $datum = date("d.m.Y",strtotime($start));
 
   			<tbody> 
 				<tr> 
-                    <td><? echo "$datum"; ?></td>
-            		<?php echo "<td>" .$datensatz['event_name']. "</td>"; ?>	
-    	    		<td><? echo "$zeitvon"; ?></td> 
-    				<td><? echo "$zeitbis"; ?></td> 
-                    <?php echo "<td>" .$datensatz['details']. "</td>"; ?> 
-               </tr> <?php  mysql_close($conID); } ?>
-           </tbody> 
+                    <td><?php echo $datum; ?></td>
+                        <td><?php echo htmlspecialchars($datensatz['event_name']); ?></td>
+                        <td><?php echo $zeitvon; ?></td>
+                                <td><?php echo $zeitbis; ?></td>
+                    <td><?php echo htmlspecialchars($datensatz['details']); ?></td>
+               </tr> <?php } $mysqli->close(); ?>
+           </tbody>
 </table>

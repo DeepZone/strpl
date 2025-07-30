@@ -9,11 +9,12 @@
 	include ('include/config.php');
 	include ('include/scheduler_connector.php');
 
-    $res=mysql_connect($mysql_server,$mysql_user,$mysql_pass); 
+    $res = new mysqli($mysql_server, $mysql_user, $mysql_pass, $mysql_db);
+    if ($res->connect_errno) {
+        die('Die Datenbank konnte nicht erreicht werden!');
+    }
 
-    mysql_select_db($mysql_db); 
-
-	$scheduler = new schedulerConnector($res);
+        $scheduler = new schedulerConnector($res);
 	//$scheduler->enable_log("log.txt",true);
 	$scheduler->render_table("events","event_id","start_date,end_date,event_name,details");
 ?>

@@ -7,9 +7,10 @@
 ******************************************************************************/
 
 
-	$mysql_server="localhost";                 // Hostname des Servers
-	$mysql_user = "c0mrsitewrite";             // MySQL User
-	$mysql_pass = "I3flmoUdwuhh";              // MySQL Passwort
-	$mysql_db = "c0mrsite";                    // MySQL Datenbankname
+// Datenbankkonfiguration
+$mysql_server = getenv('MYSQL_SERVER') ?: 'localhost';
+$mysql_user   = getenv('MYSQL_USER')   ?: 'root';
+$mysql_pass   = getenv('MYSQL_PASS')   ?: '';
+$mysql_db     = getenv('MYSQL_DB')     ?: 'strpl';
 
 ?>
