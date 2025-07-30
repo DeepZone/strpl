@@ -56,6 +56,8 @@ $datum = date("d.m.Y",strtotime($start));
           <?php // echo "<td>" .$datensatz['details']. "</td>"; ?> 
    
 
-                </tr> <?php  mysql_close($conID); } ?>
-</tbody> 
-</table>
+                 </tr>
+ <?php } ?>
+ </tbody>
+ </table>
+<?php mysql_close($conID); ?>

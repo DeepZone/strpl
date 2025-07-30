@@ -11,7 +11,7 @@
 //**************************
 
 
-include "strpl/includes/config.php";
+include "strpl/include/config.php";
 
 $conID = mysql_connect( $host, $user, $pass ) or die( "Die Datenbank konnte nicht erreicht werden!" );
 if ($conID)
@@ -54,6 +54,8 @@ $datum = date("d.m.Y",strtotime($start));
     	    		<td><? echo "$zeitvon"; ?></td> 
     				<td><? echo "$zeitbis"; ?></td> 
                     <?php echo "<td>" .$datensatz['details']. "</td>"; ?> 
-               </tr> <?php  mysql_close($conID); } ?>
-           </tbody> 
+                </tr>
+            <?php } ?>
+            </tbody>
 </table>
+<?php mysql_close($conID); ?>
